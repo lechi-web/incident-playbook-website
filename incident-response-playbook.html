@@ -1,0 +1,1343 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Incident Response Playbook</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        
+        :root {
+            --bg-primary: #0a0e17;
+            --bg-secondary: #111827;
+            --bg-tertiary: #1f2937;
+            --bg-card: #171f2e;
+            --border-color: #374151;
+            --text-primary: #f3f4f6;
+            --text-secondary: #9ca3af;
+            --text-muted: #6b7280;
+            --accent-green: #10b981;
+            --accent-slate: #64748b;
+            --accent-blue: #3b82f6;
+            --accent-purple: #8b5cf6;
+            --accent-orange: #f59e0b;
+            --accent-red: #ef4444;
+            --accent-cyan: #06b6d4;
+            --accent-pink: #ec4899;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-primary);
+            color: var(--text-primary);
+            line-height: 1.7;
+            min-height: 100vh;
+        }
+
+        /* Header */
+        .header {
+            background: linear-gradient(135deg, var(--bg-secondary) 0%, var(--bg-primary) 100%);
+            padding: 2.5rem 2rem;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .header-content {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            flex-wrap: wrap;
+            gap: 1rem;
+        }
+
+        .header-left h1 {
+            font-size: 1.75rem;
+            font-weight: 700;
+            color: var(--text-primary);
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+        }
+
+        .header-left p {
+            color: var(--text-secondary);
+            margin-top: 0.25rem;
+            font-size: 0.95rem;
+        }
+
+        .header-meta {
+            display: flex;
+            gap: 1.5rem;
+            flex-wrap: wrap;
+        }
+
+        .meta-item {
+            text-align: right;
+        }
+
+        .meta-item label {
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .meta-item span {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            font-weight: 500;
+        }
+
+        /* Navigation */
+        .nav {
+            background: var(--bg-secondary);
+            padding: 0.75rem 1rem;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .nav-container {
+            max-width: 1400px;
+            margin: 0 auto;
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+
+        .nav-btn {
+            padding: 0.5rem 1rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            color: white;
+            opacity: 0.85;
+        }
+
+        .nav-btn:hover {
+            opacity: 1;
+            transform: translateY(-1px);
+        }
+
+        /* Main Container */
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+
+        /* Playbook Category */
+        .playbook-category {
+            margin-bottom: 1.5rem;
+            border-radius: 12px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+            background: var(--bg-secondary);
+        }
+
+        .category-header {
+            padding: 1.25rem 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 1rem;
+            cursor: pointer;
+            transition: background 0.2s ease;
+            border-left: 4px solid var(--category-color);
+        }
+
+        .category-header:hover {
+            background: var(--bg-tertiary);
+        }
+
+        .category-icon {
+            width: 44px;
+            height: 44px;
+            border-radius: 10px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.4rem;
+            background: var(--category-color);
+            opacity: 0.9;
+        }
+
+        .category-info h2 {
+            font-size: 1.2rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .category-info p {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+            margin-top: 0.15rem;
+        }
+
+        .category-toggle {
+            margin-left: auto;
+            font-size: 0.9rem;
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }
+
+        .playbook-category.expanded .category-toggle {
+            transform: rotate(180deg);
+        }
+
+        .category-content {
+            display: none;
+            border-top: 1px solid var(--border-color);
+        }
+
+        .playbook-category.expanded .category-content {
+            display: block;
+        }
+
+        /* Incident Type */
+        .incident-type {
+            border-top: 1px solid var(--border-color);
+        }
+
+        .incident-type:first-child {
+            border-top: none;
+        }
+
+        .incident-header {
+            padding: 1rem 1.5rem;
+            padding-left: 2rem;
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            cursor: pointer;
+            background: var(--bg-tertiary);
+            transition: background 0.2s ease;
+        }
+
+        .incident-header:hover {
+            background: #283548;
+        }
+
+        .incident-icon {
+            width: 32px;
+            height: 32px;
+            border-radius: 8px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1rem;
+            background: rgba(255,255,255,0.1);
+        }
+
+        .incident-header h3 {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--text-primary);
+        }
+
+        .incident-toggle {
+            margin-left: auto;
+            font-size: 0.8rem;
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }
+
+        .incident-type.expanded .incident-toggle {
+            transform: rotate(180deg);
+        }
+
+        .incident-content {
+            display: none;
+            padding: 1.5rem 2rem;
+            background: var(--bg-card);
+        }
+
+        .incident-type.expanded .incident-content {
+            display: block;
+            animation: fadeIn 0.3s ease;
+        }
+
+        /* Description Box */
+        .description-box {
+            background: var(--bg-secondary);
+            border-left: 3px solid var(--category-color);
+            padding: 1rem 1.25rem;
+            margin-bottom: 1.5rem;
+            border-radius: 0 8px 8px 0;
+        }
+
+        .description-box h4 {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.5rem;
+        }
+
+        .description-box p {
+            color: var(--text-secondary);
+            font-size: 0.95rem;
+        }
+
+        /* Phase Sections */
+        .phase {
+            margin-bottom: 1.5rem;
+            background: var(--bg-secondary);
+            border-radius: 10px;
+            overflow: hidden;
+            border: 1px solid var(--border-color);
+        }
+
+        .phase-header {
+            display: flex;
+            align-items: center;
+            gap: 0.75rem;
+            padding: 1rem 1.25rem;
+            background: var(--bg-tertiary);
+            cursor: pointer;
+            border-bottom: 1px solid var(--border-color);
+        }
+
+        .phase-header:hover {
+            background: #2a3544;
+        }
+
+        .phase-number {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+            font-size: 0.85rem;
+            color: white;
+            background: var(--category-color);
+        }
+
+        .phase-header h4 {
+            font-size: 1rem;
+            font-weight: 600;
+            color: var(--text-primary);
+        }
+
+        .phase-toggle {
+            margin-left: auto;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            transition: transform 0.3s ease;
+        }
+
+        .phase.expanded .phase-toggle {
+            transform: rotate(180deg);
+        }
+
+        .phase-content {
+            display: none;
+            padding: 1.25rem;
+        }
+
+        .phase.expanded .phase-content {
+            display: block;
+        }
+
+        /* Sub-sections within phases */
+        .subsection {
+            margin-bottom: 1.25rem;
+        }
+
+        .subsection:last-child {
+            margin-bottom: 0;
+        }
+
+        .subsection-title {
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--category-color);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-bottom: 0.75rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .subsection-title::before {
+            content: '';
+            width: 3px;
+            height: 14px;
+            background: var(--category-color);
+            border-radius: 2px;
+        }
+
+        /* Lists */
+        .item-list {
+            list-style: none;
+        }
+
+        .item-list li {
+            padding: 0.5rem 0;
+            padding-left: 1.5rem;
+            position: relative;
+            color: var(--text-secondary);
+            font-size: 0.9rem;
+            border-bottom: 1px solid rgba(255,255,255,0.05);
+        }
+
+        .item-list li:last-child {
+            border-bottom: none;
+        }
+
+        .item-list li::before {
+            content: "›";
+            position: absolute;
+            left: 0;
+            color: var(--category-color);
+            font-weight: bold;
+        }
+
+        /* Conditional blocks */
+        .condition-block {
+            background: rgba(0,0,0,0.2);
+            border-radius: 8px;
+            padding: 1rem;
+            margin-bottom: 1rem;
+            border-left: 3px solid var(--text-muted);
+        }
+
+        .condition-block.warning {
+            border-left-color: var(--accent-orange);
+        }
+
+        .condition-block.danger {
+            border-left-color: var(--accent-red);
+        }
+
+        .condition-block.success {
+            border-left-color: var(--accent-green);
+        }
+
+        .condition-title {
+            font-size: 0.85rem;
+            font-weight: 600;
+            color: var(--text-primary);
+            margin-bottom: 0.5rem;
+        }
+
+        /* Severity badges */
+        .severity-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.75rem;
+            margin-top: 0.5rem;
+        }
+
+        .severity-item {
+            display: flex;
+            align-items: flex-start;
+            gap: 0.75rem;
+            padding: 0.75rem;
+            background: rgba(0,0,0,0.2);
+            border-radius: 6px;
+        }
+
+        .severity-badge {
+            padding: 0.2rem 0.6rem;
+            border-radius: 4px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            white-space: nowrap;
+        }
+
+        .severity-badge.low { background: var(--accent-green); color: white; }
+        .severity-badge.medium { background: var(--accent-orange); color: white; }
+        .severity-badge.high { background: var(--accent-red); color: white; }
+        .severity-badge.critical { background: #7f1d1d; color: white; }
+
+        .severity-text {
+            font-size: 0.85rem;
+            color: var(--text-secondary);
+        }
+
+        /* Metrics Table */
+        .metrics-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 0.75rem;
+        }
+
+        .metric-item {
+            background: rgba(0,0,0,0.2);
+            padding: 0.75rem;
+            border-radius: 6px;
+            text-align: center;
+        }
+
+        .metric-item span {
+            display: block;
+            font-size: 0.75rem;
+            color: var(--text-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+
+        .metric-item strong {
+            display: block;
+            font-size: 0.9rem;
+            color: var(--text-primary);
+            margin-top: 0.25rem;
+        }
+
+        /* Footer */
+        .footer {
+            text-align: center;
+            padding: 2rem;
+            color: var(--text-muted);
+            border-top: 1px solid var(--border-color);
+            margin-top: 2rem;
+            font-size: 0.85rem;
+        }
+
+        /* Color Themes */
+        .theme-green { --category-color: #10b981; }
+        .theme-slate { --category-color: #64748b; }
+        .theme-blue { --category-color: #3b82f6; }
+        .theme-purple { --category-color: #8b5cf6; }
+        .theme-orange { --category-color: #f59e0b; }
+        .theme-red { --category-color: #ef4444; }
+        .theme-cyan { --category-color: #06b6d4; }
+        .theme-pink { --category-color: #ec4899; }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .header-content { flex-direction: column; align-items: flex-start; }
+            .header-meta { width: 100%; justify-content: space-between; }
+            .meta-item { text-align: left; }
+            .container { padding: 1rem; }
+            .incident-content { padding: 1rem; }
+            .nav-btn { padding: 0.4rem 0.75rem; font-size: 0.8rem; }
+            .severity-grid { grid-template-columns: 1fr; }
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        /* Print */
+        @media print {
+            .nav { display: none; }
+            .playbook-category, .incident-type, .phase { break-inside: avoid; }
+            .category-content, .incident-content, .phase-content { display: block !important; }
+            body { background: white; color: black; }
+        }
+    </style>
+</head>
+<body>
+    <header class="header">
+        <div class="header-content">
+            <div class="header-left">
+                <h1>🛡️ Incident Response Playbook</h1>
+                <p>Cybersecurity Department • Standardized Response Procedures</p>
+            </div>
+            <div class="header-meta">
+                <div class="meta-item">
+                    <label>Version</label>
+                    <span id="version">2.0</span>
+                </div>
+                <div class="meta-item">
+                    <label>Last Updated</label>
+                    <span id="lastUpdated"></span>
+                </div>
+                <div class="meta-item">
+                    <label>Classification</label>
+                    <span>Internal Use Only</span>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <nav class="nav">
+        <div class="nav-container" id="navContainer"></div>
+    </nav>
+
+    <main class="container" id="playbookContainer"></main>
+
+    <footer class="footer">
+        <p>🛡️ Incident Response Playbook • Cybersecurity Department</p>
+        <p style="margin-top: 0.5rem;">For questions, contact the Security Operations Center (SOC)</p>
+    </footer>
+
+    <script>
+        // Configuration
+        const CONFIG = {
+            version: "2.0",
+            lastUpdated: "2025-02-05",
+            classification: "Internal Use Only"
+        };
+
+        // Playbook Data
+        const PLAYBOOK_DATA = [
+            // ================================================================
+            // SOCIAL ENGINEERING - GREEN
+            // ================================================================
+            {
+                id: "social-engineering",
+                name: "Social Engineering",
+                description: "Attacks that manipulate people into divulging confidential information or performing unauthorized actions",
+                icon: "🎭",
+                theme: "green",
+                incidents: [
+                    {
+                        name: "Phishing",
+                        icon: "📧",
+                        description: "An attacker attempts to deceive users into revealing credentials, downloading malware, or performing unauthorized actions via email, messaging platforms, or fake login pages.",
+                        phases: [
+                            {
+                                name: "Preparation",
+                                subtitle: "Before an Incident",
+                                sections: [
+                                    {
+                                        title: "People",
+                                        items: [
+                                            "Security team trained on phishing analysis",
+                                            "Clear reporting channel (e.g., 'Report Phish' button or email)",
+                                            "Defined escalation path for compromised accounts",
+                                            "On-call rotation for after-hours incidents"
+                                        ]
+                                    },
+                                    {
+                                        title: "Technology",
+                                        items: [
+                                            "Email filtering / anti-phishing tools configured",
+                                            "MFA enforced (especially for privileged users)",
+                                            "Centralized logging (email, auth, endpoint)",
+                                            "Password reset and session revocation capability",
+                                            "DMARC, DKIM, and SPF records configured"
+                                        ]
+                                    },
+                                    {
+                                        title: "Documentation",
+                                        items: [
+                                            "Known phishing indicators and IOCs",
+                                            "Approved communication templates",
+                                            "Inventory of critical accounts and systems",
+                                            "Contact list for key stakeholders"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Identification",
+                                sections: [
+                                    {
+                                        title: "Triggers",
+                                        items: [
+                                            "User reports suspicious email",
+                                            "Alert from email security platform",
+                                            "Detection of credential reuse or abnormal login",
+                                            "Endpoint alerts after link or attachment execution"
+                                        ]
+                                    },
+                                    {
+                                        title: "Initial Triage",
+                                        items: [
+                                            "Confirm if the email/message is malicious",
+                                            "Identify sender domain, IP, and infrastructure",
+                                            "Analyze malicious links or attachments",
+                                            "Determine targeted users and scope",
+                                            "Assess: Was the link clicked?",
+                                            "Assess: Were credentials entered?",
+                                            "Assess: Was malware executed?"
+                                        ]
+                                    },
+                                    {
+                                        title: "Severity Assessment",
+                                        type: "severity",
+                                        items: [
+                                            { level: "low", text: "Phish blocked, no user interaction" },
+                                            { level: "medium", text: "User interacted, no credentials submitted" },
+                                            { level: "high", text: "Credentials compromised or malware executed" },
+                                            { level: "critical", text: "Privileged account compromised or widespread infection" }
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Containment",
+                                sections: [
+                                    {
+                                        title: "If No Interaction",
+                                        type: "condition",
+                                        conditionType: "success",
+                                        items: [
+                                            "Block sender domain/IP at email gateway",
+                                            "Remove email from all mailboxes (search & purge)",
+                                            "Update email filters and signatures",
+                                            "Document IOCs for threat intelligence"
+                                        ]
+                                    },
+                                    {
+                                        title: "If Credentials Were Submitted",
+                                        type: "condition",
+                                        conditionType: "warning",
+                                        items: [
+                                            "Force password reset immediately",
+                                            "Revoke all active sessions and tokens",
+                                            "Disable account if necessary",
+                                            "Check for lateral movement or suspicious activity",
+                                            "Review recently accessed resources",
+                                            "Check for mail forwarding rules added"
+                                        ]
+                                    },
+                                    {
+                                        title: "If Malware Was Executed",
+                                        type: "condition",
+                                        conditionType: "danger",
+                                        items: [
+                                            "Isolate affected endpoint from network",
+                                            "Disable network access at switch level",
+                                            "Preserve forensic artifacts (memory, disk)",
+                                            "Identify malware family and capabilities",
+                                            "Check for C2 communication",
+                                            "Scan for lateral movement indicators"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Eradication",
+                                sections: [
+                                    {
+                                        title: "Actions",
+                                        items: [
+                                            "Remove malicious emails from all systems",
+                                            "Delete malicious files and persistence mechanisms",
+                                            "Block phishing infrastructure (domains, URLs, hashes)",
+                                            "Patch exploited vulnerabilities (if applicable)",
+                                            "Reset credentials for all affected accounts",
+                                            "Confirm attacker access has been fully removed",
+                                            "Update detection signatures across security tools"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Recovery",
+                                sections: [
+                                    {
+                                        title: "Actions",
+                                        items: [
+                                            "Restore user access after password reset and MFA re-enrollment",
+                                            "Re-enable endpoints after validation and scanning",
+                                            "Monitor account and system activity closely for 72 hours",
+                                            "Validate no unauthorized changes were made",
+                                            "Restore from backup if data was corrupted",
+                                            "Communicate resolution to affected users"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Communication",
+                                sections: [
+                                    {
+                                        title: "Internal",
+                                        items: [
+                                            "Notify security leadership and CISO",
+                                            "Inform IT/helpdesk of required actions",
+                                            "Brief management if impact threshold met",
+                                            "Alert HR if employee-related actions needed",
+                                            "Document in incident tracking system"
+                                        ]
+                                    },
+                                    {
+                                        title: "External (if required)",
+                                        items: [
+                                            "Customer notification (if data exposure occurred)",
+                                            "Legal / compliance team involvement",
+                                            "Regulator notification (jurisdiction-dependent)",
+                                            "Law enforcement notification (if applicable)",
+                                            "Public relations / communications team"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Lessons Learned",
+                                subtitle: "Post-Incident Review",
+                                sections: [
+                                    {
+                                        title: "Review Questions",
+                                        items: [
+                                            "How was the phishing email delivered?",
+                                            "Why did the user trust it?",
+                                            "Did controls fail or were they missing?",
+                                            "Were response steps fast and clear?",
+                                            "What changes reduce recurrence?"
+                                        ]
+                                    },
+                                    {
+                                        title: "Action Items",
+                                        items: [
+                                            "Improve email filtering rules",
+                                            "Update user awareness training content",
+                                            "Adjust playbook or detection logic",
+                                            "Implement additional technical controls",
+                                            "Schedule follow-up review meeting"
+                                        ]
+                                    }
+                                ]
+                            },
+                            {
+                                name: "Metrics to Track",
+                                sections: [
+                                    {
+                                        title: "Key Performance Indicators",
+                                        type: "metrics",
+                                        items: [
+                                            { label: "Time to Detect", value: "MTTD" },
+                                            { label: "Time to Contain", value: "MTTC" },
+                                            { label: "Time to Recover", value: "MTTR" },
+                                            { label: "Users Affected", value: "Count" },
+                                            { label: "Repeat Indicators", value: "IOC Hits" },
+                                            { label: "Controls Improved", value: "Count" }
+                                        ]
+                                    }
+                                ]
+                            }
+                        ]
+                    },
+                    {
+                        name: "Vishing",
+                        icon: "📞",
+                        description: "Voice phishing attacks where attackers use phone calls to deceive users into revealing sensitive information, transferring funds, or granting access.",
+                        phases: [
+                            {
+                                name: "Preparation",
+                                sections: [
+                                    { title: "People", items: ["Train employees on vishing tactics and red flags", "Establish verification callback procedures", "Define approved communication channels", "Create escalation path for suspicious calls"] },
+                                    { title: "Technology", items: ["Call recording capability for sensitive lines", "Caller ID and spam filtering", "Documented list of official company numbers", "MFA for all sensitive operations"] },
+                                    { title: "Documentation", items: ["Verification procedures for wire transfers", "Approved vendor contact list", "Known vishing scripts and scenarios", "Reporting procedures"] }
+                                ]
+                            },
+                            {
+                                name: "Identification",
+                                sections: [
+                                    { title: "Triggers", items: ["Employee reports suspicious call", "Unusual request for sensitive information", "Pressure tactics or urgency claims", "Caller refuses callback verification"] },
+                                    { title: "Initial Triage", items: ["Document caller details (number, name, organization claimed)", "Record conversation details and requests made", "Verify claimed identity through official channels", "Determine if any information was disclosed"] },
+                                    { title: "Severity Assessment", type: "severity", items: [
+                                        { level: "low", text: "Call identified as suspicious, no information shared" },
+                                        { level: "medium", text: "Non-sensitive information shared" },
+                                        { level: "high", text: "Credentials or sensitive data disclosed" },
+                                        { level: "critical", text: "Financial transaction initiated or privileged access granted" }
+                                    ]}
+                                ]
+                            },
+                            {
+                                name: "Containment",
+                                sections: [
+                                    { title: "If No Information Shared", type: "condition", conditionType: "success", items: ["Block caller number if identifiable", "Alert potentially targeted employees", "Update known vishing number list", "Document incident for tracking"] },
+                                    { title: "If Information Was Disclosed", type: "condition", conditionType: "warning", items: ["Reset compromised credentials immediately", "Freeze accounts if financial data shared", "Halt any pending transactions", "Review account activity for unauthorized actions"] },
+                                    { title: "If Transaction Initiated", type: "condition", conditionType: "danger", items: ["Contact financial institution immediately", "Attempt transaction reversal", "Freeze all related accounts", "Preserve all evidence and recordings", "Engage legal counsel"] }
+                                ]
+                            },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Block identified phone numbers", "Update spam filters with new indicators", "Remove any unauthorized account changes", "Verify no persistence mechanisms"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Restore account access with new credentials", "Verify no unauthorized changes remain", "Resume normal operations", "Monitor for follow-up attempts"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["Notify security team and management", "Alert HR if employee behavior involved", "Brief finance team if transactions affected"] }, { title: "External", items: ["Report to law enforcement if significant loss", "Notify customers if their data was compromised", "Coordinate with financial institutions"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["How did attacker obtain target information?", "Were verification procedures followed?", "What made the call convincing?", "How can training be improved?"] }, { title: "Action Items", items: ["Update vishing awareness training", "Strengthen verification procedures", "Review authentication for sensitive operations"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Time to Report", value: "Avg" }, { label: "Calls Blocked", value: "Count" }, { label: "Training Completion", value: "%" }] }] }
+                        ]
+                    },
+                    {
+                        name: "Smishing",
+                        icon: "💬",
+                        description: "SMS-based phishing attacks where malicious text messages trick users into clicking links, downloading malware, or revealing sensitive information.",
+                        phases: [
+                            { name: "Preparation", sections: [{ title: "People", items: ["Train employees on SMS-based threats", "Establish mobile device policies", "Define approved SMS communication channels"] }, { title: "Technology", items: ["Mobile Device Management (MDM) deployed", "SMS filtering capabilities", "Mobile threat defense solutions"] }, { title: "Documentation", items: ["Known smishing patterns", "Approved sender list", "Reporting procedures"] }] },
+                            { name: "Identification", sections: [{ title: "Triggers", items: ["User reports suspicious SMS", "MDM detects malicious app installation", "Unusual mobile data usage", "Reports of compromised accounts"] }, { title: "Initial Triage", items: ["Analyze suspicious message content and links", "Identify scope of targeted users", "Determine if links were clicked", "Check for app installations or data disclosure"] }, { title: "Severity Assessment", type: "severity", items: [{ level: "low", text: "Message received, no interaction" }, { level: "medium", text: "Link clicked, no data entered" }, { level: "high", text: "Credentials entered or malware installed" }] }] },
+                            { name: "Containment", sections: [{ title: "Actions", items: ["Block malicious sender numbers", "Alert all employees organization-wide", "Disable compromised mobile accounts", "Isolate affected devices via MDM", "Block malicious domains at network level"] }] },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Remove malicious applications", "Reset compromised credentials", "Update mobile security policies", "Block identified malicious infrastructure"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Restore device functionality", "Re-enable accounts with new credentials", "Verify device security posture", "Resume normal mobile operations"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["Notify security and IT teams", "Send organization-wide awareness alert", "Brief management on scope and impact"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["How did attackers obtain phone numbers?", "Were mobile protections effective?", "What training gaps exist?"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Time to Detect", value: "MTTD" }, { label: "Devices Affected", value: "Count" }] }] }
+                        ]
+                    },
+                    {
+                        name: "Pretexting",
+                        icon: "🎭",
+                        description: "Social engineering attack where an attacker creates a fabricated scenario (pretext) to manipulate targets into providing information or access.",
+                        phases: [
+                            { name: "Preparation", sections: [{ title: "People", items: ["Train staff on pretexting tactics", "Establish identity verification procedures", "Define information classification levels", "Create culture of healthy skepticism"] }, { title: "Technology", items: ["Access controls based on need-to-know", "Audit logging for information access", "Authentication for sensitive requests"] }, { title: "Documentation", items: ["Information handling procedures", "Verification checklists", "Known pretexting scenarios"] }] },
+                            { name: "Identification", sections: [{ title: "Triggers", items: ["Unusual requests for information", "Inconsistencies in stated identity", "Pressure or urgency tactics", "Requests bypassing normal channels"] }, { title: "Initial Triage", items: ["Verify claimed identity", "Assess information requested", "Determine if data was shared", "Identify potential attacker goals"] }, { title: "Severity Assessment", type: "severity", items: [{ level: "low", text: "Attempt identified, no information shared" }, { level: "medium", text: "Non-sensitive information disclosed" }, { level: "high", text: "Sensitive data or access granted" }] }] },
+                            { name: "Containment", sections: [{ title: "Actions", items: ["Cease communication with attacker", "Document all interaction details", "Assess what information was disclosed", "Determine potential attack progression", "Alert potentially affected parties"] }] },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Revoke any granted access", "Change credentials if disclosed", "Update verification procedures", "Block known attacker contact methods"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Restore normal access controls", "Monitor for misuse of disclosed information", "Implement additional verification steps", "Resume operations with enhanced vigilance"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["Brief security team and management", "Notify affected departments", "Share indicators across organization"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["What made the pretext convincing?", "Were verification procedures followed?", "How can controls be strengthened?"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Attempts Identified", value: "Count" }, { label: "Training Effectiveness", value: "%" }] }] }
+                        ]
+                    }
+                ]
+            },
+
+            // ================================================================
+            // MALWARE - SLATE
+            // ================================================================
+            {
+                id: "malware",
+                name: "Malware",
+                description: "Malicious software designed to damage, disrupt, or gain unauthorized access to systems",
+                icon: "🦠",
+                theme: "slate",
+                incidents: [
+                    {
+                        name: "Ransomware",
+                        icon: "🔐",
+                        description: "Malware that encrypts files and demands payment for decryption keys, often combined with data exfiltration for double extortion.",
+                        phases: [
+                            {
+                                name: "Preparation",
+                                sections: [
+                                    { title: "People", items: ["IR team trained on ransomware response", "Executive decision tree for payment scenarios", "Legal counsel identified and on-call", "Communication team briefed on protocols"] },
+                                    { title: "Technology", items: ["Offline, air-gapped backups tested regularly", "EDR with ransomware protection deployed", "Network segmentation implemented", "Immutable backup storage configured"] },
+                                    { title: "Documentation", items: ["Ransomware response runbook", "Backup restoration procedures", "Cyber insurance policy details", "Critical system priority list", "Communication templates for stakeholders"] }
+                                ]
+                            },
+                            {
+                                name: "Identification",
+                                sections: [
+                                    { title: "Triggers", items: ["Ransom note discovered", "Mass file encryption detected", "EDR alerts on ransomware behavior", "Users report inaccessible files", "Unusual process activity"] },
+                                    { title: "Initial Triage", items: ["Identify ransomware variant (ID Ransomware)", "Determine encryption scope and spread", "Identify patient zero and infection vector", "Check for data exfiltration (double extortion)", "Assess backup integrity and availability"] },
+                                    { title: "Severity Assessment", type: "severity", items: [
+                                        { level: "low", text: "Single endpoint, contained, backups available" },
+                                        { level: "medium", text: "Multiple systems, no critical infrastructure" },
+                                        { level: "high", text: "Critical systems affected, operations impacted" },
+                                        { level: "critical", text: "Widespread encryption, data exfiltration confirmed, no viable backups" }
+                                    ]}
+                                ]
+                            },
+                            {
+                                name: "Containment",
+                                sections: [
+                                    { title: "Immediate Actions", type: "condition", conditionType: "danger", items: ["Isolate infected systems IMMEDIATELY", "Disconnect network segments", "Disable compromised accounts", "Power off spreading systems if necessary", "Protect unaffected backups", "Preserve forensic evidence"] },
+                                    { title: "Network Actions", items: ["Block C2 communication at firewall", "Disable file sharing protocols", "Segment critical systems", "Enable emergency access controls", "Engage incident response retainer"] }
+                                ]
+                            },
+                            {
+                                name: "Eradication",
+                                sections: [
+                                    { title: "Actions", items: ["Check No More Ransom for free decryptors", "Evaluate payment decision with leadership (not recommended)", "Completely wipe infected systems", "Close initial access vulnerability", "Reset ALL credentials organization-wide", "Remove persistence mechanisms", "Verify attacker access fully removed"] }
+                                ]
+                            },
+                            {
+                                name: "Recovery",
+                                sections: [
+                                    { title: "Actions", items: ["Restore from clean, verified backups", "Rebuild systems from known-good images", "Prioritize critical business systems", "Verify data integrity post-restoration", "Gradually reconnect restored systems", "Implement enhanced monitoring", "Test all business functions"] }
+                                ]
+                            },
+                            {
+                                name: "Communication",
+                                sections: [
+                                    { title: "Internal", items: ["Activate crisis communication plan", "Brief executive leadership", "Coordinate with legal and HR", "Update employees on status"] },
+                                    { title: "External", items: ["Report to FBI IC3 / law enforcement", "Notify affected parties if data exfiltrated", "File cyber insurance claim", "Engage PR for public communication", "Regulatory notifications as required"] }
+                                ]
+                            },
+                            {
+                                name: "Lessons Learned",
+                                sections: [
+                                    { title: "Review Questions", items: ["What was the initial access vector?", "How long was attacker in environment?", "Were backups truly protected?", "Did segmentation limit spread?", "Was response timely and effective?"] },
+                                    { title: "Action Items", items: ["Improve backup isolation and testing", "Enhance endpoint protection", "Implement additional segmentation", "Update detection capabilities", "Conduct tabletop exercise"] }
+                                ]
+                            },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Time to Detect", value: "MTTD" }, { label: "Time to Contain", value: "MTTC" }, { label: "Systems Affected", value: "Count" }, { label: "Recovery Time", value: "Hours" }, { label: "Data Loss", value: "GB/Records" }] }] }
+                        ]
+                    },
+                    {
+                        name: "Trojan / Backdoor",
+                        icon: "🐴",
+                        description: "Malicious software disguised as legitimate programs that provide unauthorized remote access to attackers.",
+                        phases: [
+                            { name: "Preparation", sections: [{ title: "People", items: ["Security team trained on malware analysis", "Clear escalation procedures", "Forensic capability available"] }, { title: "Technology", items: ["EDR deployed on all endpoints", "Network traffic monitoring", "Application whitelisting", "Sandboxing capability"] }, { title: "Documentation", items: ["Malware analysis procedures", "IOC sharing processes", "System baseline documentation"] }] },
+                            { name: "Identification", sections: [{ title: "Triggers", items: ["EDR/AV detection alert", "Unusual outbound connections", "Suspicious process behavior", "User reports unusual activity"] }, { title: "Initial Triage", items: ["Identify malware family and capabilities", "Determine C2 infrastructure", "Assess scope of infection", "Identify persistence mechanisms", "Check for lateral movement"] }, { title: "Severity Assessment", type: "severity", items: [{ level: "low", text: "Detected and blocked, no execution" }, { level: "medium", text: "Executed on single system, contained" }, { level: "high", text: "Active C2, potential data access" }, { level: "critical", text: "Widespread infection, privileged access" }] }] },
+                            { name: "Containment", sections: [{ title: "Actions", items: ["Isolate infected systems", "Block C2 domains and IPs", "Disable compromised accounts", "Capture memory and disk images", "Identify and contain lateral movement"] }] },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Remove malicious files and registry entries", "Eliminate persistence mechanisms", "Patch exploited vulnerabilities", "Reset compromised credentials", "Update security signatures"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Rebuild or restore from clean backups", "Verify system integrity", "Gradually reconnect to network", "Monitor for reinfection"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["Notify security leadership", "Brief affected system owners", "Update threat intelligence"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["How did malware enter the environment?", "Why wasn't it detected sooner?", "Were response procedures effective?"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Dwell Time", value: "Days" }, { label: "Systems Cleaned", value: "Count" }] }] }
+                        ]
+                    },
+                    {
+                        name: "Spyware",
+                        icon: "👁️",
+                        description: "Malware designed to secretly monitor user activity, capture keystrokes, screenshots, or exfiltrate sensitive data.",
+                        phases: [
+                            { name: "Preparation", sections: [{ title: "People", items: ["Security awareness on spyware risks", "Privacy officer involvement", "Legal counsel awareness"] }, { title: "Technology", items: ["Anti-spyware/EDR solutions", "DLP monitoring", "Network traffic analysis", "Encrypted communications"] }, { title: "Documentation", items: ["Data classification policies", "Sensitive data locations", "Privacy incident procedures"] }] },
+                            { name: "Identification", sections: [{ title: "Triggers", items: ["Unusual data exfiltration", "Keylogger detection", "Screenshot capture activity", "Unauthorized camera/microphone access"] }, { title: "Initial Triage", items: ["Identify spyware capabilities", "Determine data potentially captured", "Assess installation timeframe", "Identify affected users/systems"] }, { title: "Severity Assessment", type: "severity", items: [{ level: "medium", text: "Spyware detected, limited data exposure" }, { level: "high", text: "Credentials or sensitive data captured" }, { level: "critical", text: "Extended monitoring of privileged users" }] }] },
+                            { name: "Containment", sections: [{ title: "Actions", items: ["Isolate affected systems", "Block exfiltration channels", "Disable captured credentials", "Preserve evidence"] }] },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Remove spyware completely", "Reset all potentially captured credentials", "Scan for additional infections", "Patch entry vectors"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Restore clean system state", "Re-issue credentials securely", "Monitor for continued activity", "Verify no data leakage ongoing"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["Notify privacy officer", "Brief affected users", "Legal notification if required"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["How was spyware installed?", "What data was potentially compromised?", "How can detection be improved?"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Data Exposure", value: "Scope" }, { label: "Detection Time", value: "Days" }] }] }
+                        ]
+                    }
+                ]
+            },
+
+            // ================================================================
+            // ACCOUNT COMPROMISE - BLUE
+            // ================================================================
+            {
+                id: "account-compromise",
+                name: "Account Compromise",
+                description: "Unauthorized access to user accounts through various attack techniques",
+                icon: "🔑",
+                theme: "blue",
+                incidents: [
+                    {
+                        name: "Credential Stuffing",
+                        icon: "🔓",
+                        description: "Automated attacks using stolen username/password pairs from data breaches to gain unauthorized access to accounts.",
+                        phases: [
+                            { name: "Preparation", sections: [{ title: "People", items: ["Security team trained on credential attacks", "User support procedures for compromised accounts", "Fraud team coordination"] }, { title: "Technology", items: ["Rate limiting on authentication", "CAPTCHA implementation", "Bot detection solutions", "Credential breach monitoring", "MFA enforcement"] }, { title: "Documentation", items: ["Authentication monitoring procedures", "Account lockout policies", "User notification templates"] }] },
+                            { name: "Identification", sections: [{ title: "Triggers", items: ["Spike in failed login attempts", "Multiple accounts accessed from same IP", "Login from unusual locations", "Bot detection alerts", "User reports of unauthorized access"] }, { title: "Initial Triage", items: ["Identify attack source IPs", "Determine scope of affected accounts", "Assess successful vs failed attempts", "Check for fraudulent activity"] }, { title: "Severity Assessment", type: "severity", items: [{ level: "low", text: "Attack detected, all attempts blocked" }, { level: "medium", text: "Some accounts compromised, no sensitive actions" }, { level: "high", text: "Multiple accounts compromised, data accessed" }, { level: "critical", text: "Widespread compromise, financial or data theft" }] }] },
+                            { name: "Containment", sections: [{ title: "Actions", items: ["Block attacking IP ranges", "Force password reset for compromised accounts", "Enable additional CAPTCHA challenges", "Temporarily increase authentication restrictions", "Lock accounts showing suspicious activity"] }] },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Reset all compromised credentials", "Revoke active sessions", "Remove unauthorized changes", "Update rate limiting rules", "Enhance bot detection"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Restore account access with new credentials", "Verify no unauthorized changes", "Enable MFA for affected accounts", "Monitor for continued attacks"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["Notify security and fraud teams", "Brief customer support", "Update leadership on scope"] }, { title: "External", items: ["Notify affected users", "Provide guidance on password security", "Consider breach notification requirements"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["Were rate limits effective?", "How quickly was attack detected?", "Should MFA be mandatory?"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Accounts Compromised", value: "Count" }, { label: "Detection Time", value: "Minutes" }, { label: "Block Rate", value: "%" }] }] }
+                        ]
+                    },
+                    {
+                        name: "MFA Fatigue",
+                        icon: "📱",
+                        description: "Attack where adversaries repeatedly send MFA push notifications hoping the user will approve out of frustration.",
+                        phases: [
+                            { name: "Preparation", sections: [{ title: "People", items: ["User education on MFA fatigue attacks", "Clear reporting procedures", "Security team monitoring"] }, { title: "Technology", items: ["MFA with number matching or biometrics", "Push notification limits", "Anomaly detection on MFA requests", "Passwordless authentication consideration"] }, { title: "Documentation", items: ["MFA policies and procedures", "User guidance documents", "Incident response procedures"] }] },
+                            { name: "Identification", sections: [{ title: "Triggers", items: ["Multiple MFA requests in short period", "User reports unsolicited MFA prompts", "MFA approval from unusual location", "After-hours authentication activity"] }, { title: "Initial Triage", items: ["Identify targeted accounts", "Determine if any prompts were approved", "Assess attacker's credential source", "Check for successful access"] }, { title: "Severity Assessment", type: "severity", items: [{ level: "low", text: "Requests denied, user reported" }, { level: "medium", text: "Requests approved, login detected" }, { level: "high", text: "Account accessed, actions taken" }] }] },
+                            { name: "Containment", sections: [{ title: "If Prompt Was Denied", type: "condition", conditionType: "success", items: ["Block source IP addresses", "Reset account password", "Monitor for continued attempts"] }, { title: "If Prompt Was Approved", type: "condition", conditionType: "danger", items: ["Immediately disable the account", "Revoke all active sessions", "Check for unauthorized actions", "Preserve access logs", "Assess lateral movement"] }] },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Reset compromised credentials", "Upgrade MFA to phishing-resistant method", "Block known attacker infrastructure", "Remove any persistence mechanisms"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Re-enable account with stronger MFA", "Verify no unauthorized changes", "Monitor account activity closely", "User education reinforcement"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["Notify security leadership", "Alert other potentially targeted users", "Update SOC monitoring"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["Is current MFA method adequate?", "Should we implement number matching?", "Was user training effective?"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Fatigue Attempts", value: "Count" }, { label: "User Report Rate", value: "%" }] }] }
+                        ]
+                    },
+                    {
+                        name: "Privileged Account Takeover",
+                        icon: "👑",
+                        description: "Compromise of administrator or privileged service accounts providing elevated access to critical systems.",
+                        phases: [
+                            { name: "Preparation", sections: [{ title: "People", items: ["PAM team trained on incident response", "Clear escalation to CISO", "Separation of duties enforced"] }, { title: "Technology", items: ["Privileged Access Management (PAM) solution", "Just-in-time access provisioning", "Session recording and monitoring", "Privileged account discovery"] }, { title: "Documentation", items: ["Privileged account inventory", "Emergency access procedures", "Break-glass account processes"] }] },
+                            { name: "Identification", sections: [{ title: "Triggers", items: ["Unusual privileged account activity", "Access from unauthorized location", "Off-hours administrative actions", "PAM alerts on policy violations"] }, { title: "Initial Triage", items: ["Identify compromised privileged account", "Determine scope of access", "Assess actions taken with privileges", "Check for persistence mechanisms"] }, { title: "Severity Assessment", type: "severity", items: [{ level: "high", text: "Single admin account, limited access" }, { level: "critical", text: "Domain admin or widespread privileged access" }] }] },
+                            { name: "Containment", sections: [{ title: "Immediate Actions", type: "condition", conditionType: "danger", items: ["Disable compromised privileged account", "Revoke all active privileged sessions", "Enable break-glass procedures if needed", "Isolate systems accessed", "Engage forensics team", "Check for Golden Ticket/Silver Ticket attacks"] }] },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Reset ALL privileged credentials", "Rotate service account passwords", "Reset Kerberos keys (krbtgt) twice", "Remove any created admin accounts", "Eliminate persistence mechanisms", "Verify AD integrity"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Restore privileged access gradually", "Implement enhanced monitoring", "Verify system integrity", "Review and reduce privileges", "Enable additional PAM controls"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["Immediate CISO notification", "Brief executive leadership", "Coordinate with all IT teams", "Legal involvement for potential breach"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["How was privileged access obtained?", "Were PAM controls bypassed?", "Is just-in-time access implemented?"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Dwell Time", value: "Hours" }, { label: "Systems Accessed", value: "Count" }, { label: "Recovery Time", value: "Hours" }] }] }
+                        ]
+                    }
+                ]
+            },
+
+            // ================================================================
+            // WEB APPLICATION ATTACKS - PURPLE
+            // ================================================================
+            {
+                id: "web-application",
+                name: "Web Application Attacks",
+                description: "Attacks targeting vulnerabilities in web applications and APIs",
+                icon: "🌐",
+                theme: "purple",
+                incidents: [
+                    {
+                        name: "SQL Injection",
+                        icon: "💉",
+                        description: "Attack that inserts malicious SQL code into application queries to access, modify, or delete database content.",
+                        phases: [
+                            { name: "Preparation", sections: [{ title: "People", items: ["Developers trained on secure coding", "Security team with SQLi expertise", "DBA involvement for database review"] }, { title: "Technology", items: ["Web Application Firewall (WAF)", "Database activity monitoring", "Parameterized queries enforced", "Input validation libraries"] }, { title: "Documentation", items: ["Secure coding standards", "Database access patterns", "Application inventory"] }] },
+                            { name: "Identification", sections: [{ title: "Triggers", items: ["WAF SQL injection alerts", "Unusual database queries", "Error messages indicating SQL errors", "Data exfiltration patterns"] }, { title: "Initial Triage", items: ["Identify vulnerable endpoint", "Determine attack payload", "Assess data accessed or modified", "Check for data exfiltration"] }, { title: "Severity Assessment", type: "severity", items: [{ level: "low", text: "Attack blocked by WAF" }, { level: "medium", text: "Successful injection, limited data access" }, { level: "high", text: "Sensitive data accessed or modified" }, { level: "critical", text: "Database compromised, mass data exfiltration" }] }] },
+                            { name: "Containment", sections: [{ title: "Actions", items: ["Block attacking IP addresses", "Disable vulnerable functionality", "Implement emergency WAF rules", "Preserve database logs", "Take application offline if necessary"] }] },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Patch vulnerable code", "Implement parameterized queries", "Review all similar code patterns", "Update WAF signatures", "Rotate database credentials"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Restore data from backup if modified", "Re-enable application with fixes", "Verify fix effectiveness", "Monitor for continued attacks"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["Notify development team", "Brief security leadership", "Update change management"] }, { title: "External", items: ["Notify affected users if data breached", "Regulatory notification if required"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["Why was vulnerable code deployed?", "Was code review performed?", "Are security scans in CI/CD?"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Time to Patch", value: "Hours" }, { label: "Records Affected", value: "Count" }] }] }
+                        ]
+                    },
+                    {
+                        name: "Cross-Site Scripting (XSS)",
+                        icon: "📜",
+                        description: "Attack that injects malicious scripts into web pages viewed by other users, enabling session hijacking or data theft.",
+                        phases: [
+                            { name: "Preparation", sections: [{ title: "People", items: ["Developer training on XSS prevention", "Security team monitoring", "QA testing for XSS"] }, { title: "Technology", items: ["Content Security Policy (CSP) headers", "Output encoding libraries", "WAF with XSS detection", "HTTPOnly cookies"] }, { title: "Documentation", items: ["Secure coding guidelines", "Approved sanitization methods", "Testing procedures"] }] },
+                            { name: "Identification", sections: [{ title: "Triggers", items: ["WAF XSS detection alerts", "User reports of suspicious behavior", "Session hijacking detected", "Unusual cookie access patterns"] }, { title: "Initial Triage", items: ["Identify vulnerable page/component", "Determine XSS type (stored/reflected/DOM)", "Assess potential victim impact", "Check for session compromise"] }, { title: "Severity Assessment", type: "severity", items: [{ level: "low", text: "Reflected XSS, limited exposure" }, { level: "medium", text: "Stored XSS, user data at risk" }, { level: "high", text: "Admin sessions compromised" }] }] },
+                            { name: "Containment", sections: [{ title: "Actions", items: ["Remove malicious stored content", "Invalidate potentially compromised sessions", "Implement emergency CSP rules", "Block attack patterns at WAF"] }] },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Fix vulnerable code with proper encoding", "Implement CSP headers", "Review similar code patterns", "Update input validation"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Deploy patched application", "Force session refresh for users", "Verify fix effectiveness", "Monitor for variants"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["Notify development team", "Update security documentation"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["Was output encoding properly implemented?", "Is CSP deployed effectively?", "Are automated scans detecting XSS?"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Users Affected", value: "Count" }, { label: "Time to Fix", value: "Hours" }] }] }
+                        ]
+                    },
+                    {
+                        name: "File Upload Abuse",
+                        icon: "📁",
+                        description: "Attack exploiting file upload functionality to upload malicious files, web shells, or malware.",
+                        phases: [
+                            { name: "Preparation", sections: [{ title: "People", items: ["Developer training on secure uploads", "Security team file analysis capability"] }, { title: "Technology", items: ["File type validation (magic bytes)", "Malware scanning on uploads", "Separate storage for uploads", "Execution prevention on upload directories"] }, { title: "Documentation", items: ["Allowed file types list", "Upload handling procedures", "Monitoring requirements"] }] },
+                            { name: "Identification", sections: [{ title: "Triggers", items: ["Malware scan detection", "Unusual files in upload directory", "Web shell activity detected", "Unexpected server-side execution"] }, { title: "Initial Triage", items: ["Identify malicious uploaded files", "Determine upload source/user", "Assess if files were executed", "Check for persistence"] }, { title: "Severity Assessment", type: "severity", items: [{ level: "low", text: "Malicious upload blocked" }, { level: "medium", text: "File uploaded but not executed" }, { level: "high", text: "Web shell active on server" }, { level: "critical", text: "Server compromised, lateral movement" }] }] },
+                            { name: "Containment", sections: [{ title: "Actions", items: ["Remove malicious files immediately", "Disable upload functionality", "Isolate affected server", "Block attacker access", "Preserve evidence"] }] },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Scan and clean all upload directories", "Implement proper file validation", "Remove any web shells or backdoors", "Patch upload vulnerabilities"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Re-enable uploads with new controls", "Verify server integrity", "Monitor for reinfection", "Test new upload restrictions"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["Notify development and ops teams", "Brief security leadership"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["Why did validation fail?", "Is content scanning effective?", "Are uploads properly isolated?"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Detection Time", value: "Minutes" }, { label: "Files Removed", value: "Count" }] }] }
+                        ]
+                    }
+                ]
+            },
+
+            // ================================================================
+            // INSIDER THREAT - ORANGE
+            // ================================================================
+            {
+                id: "insider-threat",
+                name: "Insider Threat",
+                description: "Malicious or negligent actions by employees, contractors, or partners with legitimate access",
+                icon: "👤",
+                theme: "orange",
+                incidents: [
+                    {
+                        name: "Data Exfiltration",
+                        icon: "📤",
+                        description: "Intentional unauthorized transfer of sensitive data outside the organization by an insider.",
+                        phases: [
+                            { name: "Preparation", sections: [{ title: "People", items: ["HR and Legal partnership established", "Security team trained on insider investigations", "Management awareness training"] }, { title: "Technology", items: ["Data Loss Prevention (DLP) deployed", "User Behavior Analytics (UBA)", "Endpoint monitoring", "Cloud access security broker (CASB)"] }, { title: "Documentation", items: ["Data classification policies", "Acceptable use policies", "Investigation procedures", "Chain of custody requirements"] }] },
+                            { name: "Identification", sections: [{ title: "Triggers", items: ["DLP alerts on sensitive data transfer", "Unusual data access patterns", "Large file transfers detected", "USB device usage alerts", "Cloud upload activity"] }, { title: "Initial Triage", items: ["Verify data sensitivity level", "Identify user and their role", "Determine data destination", "Assess business justification", "Check for policy violations"] }, { title: "Severity Assessment", type: "severity", items: [{ level: "low", text: "Non-sensitive data, potential policy violation" }, { level: "medium", text: "Sensitive data, unclear intent" }, { level: "high", text: "Confidential data, malicious indicators" }, { level: "critical", text: "Trade secrets or regulated data confirmed exfiltrated" }] }] },
+                            { name: "Containment", sections: [{ title: "Evidence Preservation", type: "condition", conditionType: "warning", items: ["Preserve all logs and evidence", "Do NOT alert the subject immediately", "Coordinate with HR and Legal", "Document chain of custody", "Continue monitoring activity"] }, { title: "Access Restriction (when approved)", items: ["Restrict access to sensitive systems", "Disable external transfer capabilities", "Monitor continued activity", "Prepare for interview/termination"] }] },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Terminate all access (coordinate with HR)", "Recover company assets and devices", "Attempt to retrieve exfiltrated data", "Review all systems user accessed", "Remove any planted backdoors"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Reassign responsibilities", "Review and revoke shared access", "Implement enhanced monitoring", "Assess need for customer notification"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["Coordinate closely with HR and Legal", "Brief executive leadership", "Need-to-know basis only", "Prepare for potential litigation"] }, { title: "External", items: ["Law enforcement if warranted", "Customer notification if their data affected", "Regulatory reporting as required"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["Were warning signs missed?", "Did DLP function as expected?", "Were access controls appropriate?", "Is offboarding process adequate?"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Data Volume", value: "GB" }, { label: "Detection Time", value: "Days" }, { label: "Investigation Duration", value: "Days" }] }] }
+                        ]
+                    },
+                    {
+                        name: "Privilege Abuse",
+                        icon: "⚠️",
+                        description: "Misuse of legitimate access privileges for unauthorized purposes.",
+                        phases: [
+                            { name: "Preparation", sections: [{ title: "People", items: ["Management training on privilege risks", "Security team monitoring capability", "HR partnership for investigations"] }, { title: "Technology", items: ["Privileged Access Management (PAM)", "Comprehensive audit logging", "User behavior analytics", "Separation of duties controls"] }, { title: "Documentation", items: ["Role-based access policies", "Audit procedures", "Investigation guidelines"] }] },
+                            { name: "Identification", sections: [{ title: "Triggers", items: ["Access to data outside job function", "Off-hours privileged activity", "Policy violation alerts", "Peer or manager reports"] }, { title: "Initial Triage", items: ["Verify unauthorized access occurred", "Identify business justification", "Assess data or systems accessed", "Determine intent indicators"] }, { title: "Severity Assessment", type: "severity", items: [{ level: "low", text: "Minor policy violation, no sensitive data" }, { level: "medium", text: "Sensitive data accessed without authorization" }, { level: "high", text: "Malicious intent, data modified or stolen" }] }] },
+                            { name: "Containment", sections: [{ title: "Actions", items: ["Preserve evidence discreetly", "Coordinate with HR and Legal", "Restrict access if immediate risk", "Continue monitoring", "Prepare for formal investigation"] }] },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Remove excessive privileges", "Implement least privilege model", "Reverse unauthorized changes", "Update access controls"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Implement just-in-time access", "Enhanced monitoring for similar behavior", "Review access across organization", "Training on acceptable use"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["HR and Legal coordination", "Management notification", "Confidential handling"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["Were privileges appropriate for role?", "Was monitoring effective?", "Are access reviews regular?"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Violations Detected", value: "Count" }, { label: "Access Reviews", value: "Frequency" }] }] }
+                        ]
+                    }
+                ]
+            },
+
+            // ================================================================
+            // DATA BREACH - RED
+            // ================================================================
+            {
+                id: "data-breach",
+                name: "Data Breach",
+                description: "Unauthorized access, disclosure, or theft of sensitive data",
+                icon: "🔓",
+                theme: "red",
+                incidents: [
+                    {
+                        name: "PII/PHI Data Breach",
+                        icon: "📋",
+                        description: "Breach involving personally identifiable information (PII) or protected health information (PHI) requiring regulatory notification.",
+                        phases: [
+                            { name: "Preparation", sections: [{ title: "People", items: ["Privacy officer designated", "Legal counsel with breach experience", "Communication team ready", "Notification vendors identified"] }, { title: "Technology", items: ["Data discovery and classification", "Encryption for sensitive data", "Access logging and monitoring", "DLP controls"] }, { title: "Documentation", items: ["Data inventory and locations", "Regulatory requirements by jurisdiction", "Notification templates", "Breach response procedures"] }] },
+                            { name: "Identification", sections: [{ title: "Triggers", items: ["Unauthorized data access detected", "Data found on external systems", "Third-party notification received", "Dark web monitoring alert"] }, { title: "Initial Triage", items: ["Identify data types exposed", "Determine number of affected individuals", "Assess jurisdictions involved", "Evaluate notification requirements", "Establish breach timeline"] }, { title: "Severity Assessment", type: "severity", items: [{ level: "medium", text: "Limited PII, single jurisdiction" }, { level: "high", text: "Sensitive PII, multiple jurisdictions" }, { level: "critical", text: "PHI, financial data, or mass exposure" }] }] },
+                            { name: "Containment", sections: [{ title: "Immediate Actions", type: "condition", conditionType: "danger", items: ["Stop ongoing data exposure", "Preserve all evidence", "Engage breach counsel immediately", "Activate incident response team", "Begin documentation of all actions"] }] },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Close access vector", "Remove data from unauthorized locations", "Reset compromised credentials", "Patch vulnerabilities exploited", "Verify no continued exposure"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Restore secure operations", "Implement additional protections", "Prepare for ongoing monitoring", "Set up affected individual support"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["Executive leadership briefing", "Board notification if required", "Employee communication", "Documentation for regulators"] }, { title: "External", items: ["Individual notifications within regulatory timeframes", "Regulatory authority notifications", "Credit monitoring / identity protection", "Public statement if appropriate", "Law enforcement notification"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["How was data exposed?", "Were encryption controls adequate?", "Was detection timely?", "Did notification meet requirements?"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Individuals Affected", value: "Count" }, { label: "Time to Detect", value: "Days" }, { label: "Time to Notify", value: "Days" }, { label: "Regulatory Fines", value: "$" }] }] }
+                        ]
+                    }
+                ]
+            },
+
+            // ================================================================
+            // DENIAL OF SERVICE - CYAN
+            // ================================================================
+            {
+                id: "denial-of-service",
+                name: "Denial of Service",
+                description: "Attacks designed to disrupt availability of systems and services",
+                icon: "🌊",
+                theme: "cyan",
+                incidents: [
+                    {
+                        name: "DDoS Attack",
+                        icon: "📈",
+                        description: "Distributed denial of service attack overwhelming network or application resources to cause service disruption.",
+                        phases: [
+                            { name: "Preparation", sections: [{ title: "People", items: ["NOC/SOC trained on DDoS response", "ISP emergency contacts documented", "DDoS mitigation provider relationship", "Communication team ready"] }, { title: "Technology", items: ["DDoS mitigation service contracted", "CDN for traffic distribution", "Rate limiting configured", "Traffic analysis capability", "Redundant infrastructure"] }, { title: "Documentation", items: ["Traffic baselines documented", "Mitigation activation procedures", "ISP escalation contacts", "Communication templates"] }] },
+                            { name: "Identification", sections: [{ title: "Triggers", items: ["Traffic volume anomalies", "Service degradation or outage", "IDS/IPS alerts", "Customer complaints", "Monitoring system alerts"] }, { title: "Initial Triage", items: ["Confirm DDoS vs legitimate traffic", "Identify attack type (volumetric, protocol, application)", "Determine target (network, application, specific service)", "Assess business impact", "Identify attack sources if possible"] }, { title: "Severity Assessment", type: "severity", items: [{ level: "low", text: "Minor degradation, mitigated automatically" }, { level: "medium", text: "Significant degradation, some services affected" }, { level: "high", text: "Major outage, critical services down" }, { level: "critical", text: "Complete outage, extended duration" }] }] },
+                            { name: "Containment", sections: [{ title: "Actions", items: ["Activate DDoS mitigation service", "Reroute traffic through scrubbing center", "Enable rate limiting and geo-blocking", "Contact ISP for upstream filtering", "Scale infrastructure if possible", "Communicate status to stakeholders"] }] },
+                            { name: "Eradication", sections: [{ title: "Actions", items: ["Fine-tune mitigation rules", "Block identified attack patterns", "Update WAF and firewall rules", "Implement additional filtering", "Verify attack traffic eliminated"] }] },
+                            { name: "Recovery", sections: [{ title: "Actions", items: ["Gradually reduce mitigation controls", "Monitor for attack resumption", "Restore full service availability", "Verify all systems functioning", "Document attack characteristics"] }] },
+                            { name: "Communication", sections: [{ title: "Internal", items: ["Regular status updates to leadership", "Coordinate with all technical teams", "Document timeline and actions"] }, { title: "External", items: ["Customer status page updates", "Direct communication to affected customers", "Media statement if high profile"] }] },
+                            { name: "Lessons Learned", sections: [{ title: "Review Questions", items: ["Was detection timely?", "Did mitigation activate quickly?", "Was communication effective?", "Should capacity be increased?"] }] },
+                            { name: "Metrics to Track", sections: [{ title: "Key Performance Indicators", type: "metrics", items: [{ label: "Attack Duration", value: "Minutes" }, { label: "Peak Traffic", value: "Gbps" }, { label: "Downtime", value: "Minutes" }, { label: "Mitigation Time", value: "Minutes" }] }] }
+                        ]
+                    }
+                ]
+            }
+        ];
+
+        // Rendering Functions
+        function renderPlaybook() {
+            document.getElementById('version').textContent = CONFIG.version;
+            document.getElementById('lastUpdated').textContent = CONFIG.lastUpdated;
+
+            // Render navigation
+            const navContainer = document.getElementById('navContainer');
+            navContainer.innerHTML = PLAYBOOK_DATA.map(cat => {
+                const colors = { green: '#10b981', slate: '#64748b', blue: '#3b82f6', purple: '#8b5cf6', orange: '#f59e0b', red: '#ef4444', cyan: '#06b6d4', pink: '#ec4899' };
+                return `<button class="nav-btn" style="background:${colors[cat.theme]}" onclick="scrollTo('${cat.id}')">${cat.name}</button>`;
+            }).join('');
+
+            // Render playbook categories
+            const container = document.getElementById('playbookContainer');
+            container.innerHTML = PLAYBOOK_DATA.map((cat, catIdx) => `
+                <section id="${cat.id}" class="playbook-category theme-${cat.theme} ${catIdx === 0 ? 'expanded' : ''}">
+                    <div class="category-header" onclick="toggleCategory(this)">
+                        <div class="category-icon">${cat.icon}</div>
+                        <div class="category-info">
+                            <h2>${cat.name}</h2>
+                            <p>${cat.description}</p>
+                        </div>
+                        <span class="category-toggle">▼</span>
+                    </div>
+                    <div class="category-content">
+                        ${cat.incidents.map((inc, incIdx) => renderIncident(inc, catIdx, incIdx)).join('')}
+                    </div>
+                </section>
+            `).join('');
+        }
+
+        function renderIncident(incident, catIdx, incIdx) {
+            return `
+                <div class="incident-type ${catIdx === 0 && incIdx === 0 ? 'expanded' : ''}">
+                    <div class="incident-header" onclick="toggleIncident(this)">
+                        <div class="incident-icon">${incident.icon}</div>
+                        <h3>${incident.name}</h3>
+                        <span class="incident-toggle">▼</span>
+                    </div>
+                    <div class="incident-content">
+                        <div class="description-box">
+                            <h4>Description</h4>
+                            <p>${incident.description}</p>
+                        </div>
+                        ${incident.phases.map((phase, idx) => renderPhase(phase, idx)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderPhase(phase, index) {
+            return `
+                <div class="phase ${index < 2 ? 'expanded' : ''}">
+                    <div class="phase-header" onclick="togglePhase(this)">
+                        <div class="phase-number">${index + 1}</div>
+                        <h4>${phase.name}${phase.subtitle ? ` <span style="font-weight:400;color:var(--text-muted);font-size:0.85rem;">— ${phase.subtitle}</span>` : ''}</h4>
+                        <span class="phase-toggle">▼</span>
+                    </div>
+                    <div class="phase-content">
+                        ${phase.sections.map(section => renderSection(section)).join('')}
+                    </div>
+                </div>
+            `;
+        }
+
+        function renderSection(section) {
+            if (section.type === 'severity') {
+                return `
+                    <div class="subsection">
+                        <div class="subsection-title">${section.title}</div>
+                        <div class="severity-grid">
+                            ${section.items.map(item => `
+                                <div class="severity-item">
+                                    <span class="severity-badge ${item.level}">${item.level}</span>
+                                    <span class="severity-text">${item.text}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (section.type === 'metrics') {
+                return `
+                    <div class="subsection">
+                        <div class="subsection-title">${section.title}</div>
+                        <div class="metrics-grid">
+                            ${section.items.map(item => `
+                                <div class="metric-item">
+                                    <span>${item.label}</span>
+                                    <strong>${item.value}</strong>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } else if (section.type === 'condition') {
+                return `
+                    <div class="condition-block ${section.conditionType || ''}">
+                        <div class="condition-title">${section.title}</div>
+                        <ul class="item-list">
+                            ${section.items.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } else {
+                return `
+                    <div class="subsection">
+                        <div class="subsection-title">${section.title}</div>
+                        <ul class="item-list">
+                            ${section.items.map(item => `<li>${item}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+
+        // Toggle Functions
+        function toggleCategory(el) { el.closest('.playbook-category').classList.toggle('expanded'); }
+        function toggleIncident(el) { el.closest('.incident-type').classList.toggle('expanded'); }
+        function togglePhase(el) { el.closest('.phase').classList.toggle('expanded'); }
+        function scrollTo(id) {
+            const el = document.getElementById(id);
+            if (!el.classList.contains('expanded')) el.classList.add('expanded');
+            el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        }
+
+        // Initialize
+        renderPlaybook();
+    </script>
+</body>
+</html>
